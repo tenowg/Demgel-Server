@@ -1,0 +1,14 @@
+name: ServerCommands
+main: com.thedemgel.servercommands.ServerCommands
+version: 1
+depend: [PlayerFiles]
+
+commands:
+   tele:
+      description: This is a demo command.
+      usage: /<command> [player]
+      permission-message: You don't have <permission>
+   sethome:
+      description: Set a home location.
+   home:
+      description: Go Home!
