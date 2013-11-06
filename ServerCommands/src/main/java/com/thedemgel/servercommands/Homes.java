@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 
 public class Homes {
 	public static final String DEFAULT_HOME_NAME = "default";
-	public static final ConfigKey<ConfigurationSection> HOME_SECTION = ConfigKey.newConfigKeyFromString("homes");
+	public static final ConfigKey<ConfigurationSection> HOME_SECTION = ConfigKey.newConfigKeyFromString("homes", ConfigurationSection.class);
 
 	private ServerCommands plugin;
 
@@ -47,12 +47,12 @@ public class Homes {
 		Player player = (Player) sender;
 		PlayerObject pobj = PlayerFiles.getPlayerFile(player);
 
-		ConfigKey key = ConfigKey.newConfigKeyFromConfigKey(HOME_SECTION, homename);
+		ConfigKey key = ConfigKey.newConfigKeyFromConfigKey(HOME_SECTION, ConfigurationSection.class, homename);
 
-		ConfigKey<String> world = ConfigKey.newConfigKeyFromConfigKey(key,"location", "world");
-		ConfigKey<Double> x = ConfigKey.newConfigKeyFromConfigKey(key,"location", "x");
-		ConfigKey<Double> y = ConfigKey.newConfigKeyFromConfigKey(key,"location", "y");
-		ConfigKey<Double> z = ConfigKey.newConfigKeyFromConfigKey(key,"location", "z");
+		ConfigKey<String> world = ConfigKey.newConfigKeyFromConfigKey(key, String.class, "location", "world");
+		ConfigKey<Double> x = ConfigKey.newConfigKeyFromConfigKey(key, Double.class, "location", "x");
+		ConfigKey<Double> y = ConfigKey.newConfigKeyFromConfigKey(key, Double.class, "location", "y");
+		ConfigKey<Double> z = ConfigKey.newConfigKeyFromConfigKey(key, Double.class, "location", "z");
 
 		pobj.setValue(world, new ConfigValue<>(player.getWorld().getName()));
 		pobj.setValue(x, new ConfigValue<>(player.getLocation().getX()));
@@ -85,16 +85,16 @@ public class Homes {
 		Player player = (Player) sender;
 		PlayerObject pobj = PlayerFiles.getPlayerFile(player);
 
-		ConfigKey key = ConfigKey.newConfigKeyFromConfigKey(HOME_SECTION, homename);
+		ConfigKey key = ConfigKey.newConfigKeyFromConfigKey(HOME_SECTION, ConfigurationSection.class, homename);
 
 		if (!pobj.getConfig().keyExists(key)) {
 			return new ResponseObject("Home doesn't exist.", ResponseObjectType.FAILURE);
 		}
 
-		ConfigKey<String> worldKey = ConfigKey.newConfigKeyFromConfigKey(key,"location", "world");
-		ConfigKey<Double> xKey = ConfigKey.newConfigKeyFromConfigKey(key,"location", "x");
-		ConfigKey<Double> yKey = ConfigKey.newConfigKeyFromConfigKey(key,"location", "y");
-		ConfigKey<Double> zKey = ConfigKey.newConfigKeyFromConfigKey(key,"location", "z");
+		ConfigKey<String> worldKey = ConfigKey.newConfigKeyFromConfigKey(key, String.class,"location", "world");
+		ConfigKey<Double> xKey = ConfigKey.newConfigKeyFromConfigKey(key, Double.class,"location", "x");
+		ConfigKey<Double> yKey = ConfigKey.newConfigKeyFromConfigKey(key, Double.class,"location", "y");
+		ConfigKey<Double> zKey = ConfigKey.newConfigKeyFromConfigKey(key, Double.class,"location", "z");
 
 		ConfigValue<Double> x = pobj.getValue(xKey);
 		ConfigValue<Double> y = pobj.getValue(yKey);

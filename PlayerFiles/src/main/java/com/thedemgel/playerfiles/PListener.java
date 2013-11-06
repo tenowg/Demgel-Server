@@ -17,6 +17,7 @@ public class PListener implements Listener {
 
 	@EventHandler
 	public void onPlayerLogin(PlayerLoginEvent event) {
+		System.out.println("Login");
 		plugin.addPlayerFile(event.getPlayer());
 	}
 
