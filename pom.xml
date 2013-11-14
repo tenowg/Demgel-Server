@@ -10,8 +10,9 @@
 		<module>PlayerFiles</module>
 		<module>ServerCommands</module>
 		<module>Stats</module>
-	 <module>MoneyPool</module>
-	</modules>
+		<module>MoneyPool</module>
+    <module>Bags</module>
+  </modules>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -42,6 +43,11 @@
 			<groupId>com.thedemgel</groupId>
 			<artifactId>YamlResourceBundle</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.26</version>
 		</dependency>
 	</dependencies>
 	<repositories>

@@ -1,0 +1,4 @@
+name: MoneyPool
+main: com.thedemgel.moneypool.MoneyPool
+version: 1.0-SNAPSHOT
+depend: [PlayerFiles]

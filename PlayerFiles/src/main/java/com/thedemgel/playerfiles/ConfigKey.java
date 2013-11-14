@@ -9,6 +9,7 @@ public class ConfigKey<T> {
 	private Class<? extends T> type;
 	private T value;
 	private String configKey;
+	private ConfigValue<T> defaultvalue;
 
 	public ConfigKey(String key, Class<? extends T> classtype) {
 		configKey = key;
@@ -19,11 +20,12 @@ public class ConfigKey<T> {
 	public ConfigKey(String key, T defaultValue) {
 		configKey = key;
 		value = defaultValue;
+		defaultvalue = new ConfigValue(defaultValue);
 		type = (Class<? extends T>) defaultValue.getClass();
 	}
 
-	public T getDefaultValue() {
-		return value;
+	public ConfigValue<T> getDefaultValue() {
+		return defaultvalue;
 	}
 
 	public String getKey() {

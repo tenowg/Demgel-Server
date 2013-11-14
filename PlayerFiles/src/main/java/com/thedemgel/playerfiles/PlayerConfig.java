@@ -15,6 +15,7 @@ public class PlayerConfig {
 	private final String fileName;
 	private final JavaPlugin plugin;
 	private File configFile;
+	private String player;
 	private FileConfiguration fileConfiguration;
 
 	public PlayerConfig(JavaPlugin plugin, Player player) {
@@ -28,6 +29,7 @@ public class PlayerConfig {
 		if (!plugin.isInitialized()) {
 			throw new IllegalArgumentException("plugin must be initiaized");
 		}
+		this.player = playername;
 		this.plugin = plugin;
 		this.fileName = playername + ".yml";
 		File dataFolder = new File(plugin.getDataFolder() + "/players");
@@ -35,9 +37,11 @@ public class PlayerConfig {
 			dataFolder.mkdirs();
 		}
 		this.configFile = new File(dataFolder, fileName);
+
+		reloadConfig();
 	}
 
-	public void reloadConfig() {
+	public final void reloadConfig() {
 		fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
 
 		// Look for defaults in the jar
@@ -66,6 +70,15 @@ public class PlayerConfig {
 		} else {
 			plugin.getLogger().log(Level.SEVERE, "No Config file to save..." + configFile + "  " + fileConfiguration);
 		}
+
+		// MORE TEST CODE
+		/*
+		for (String key : getConfig().getKeys(true)) {
+			if (!getConfig().isConfigurationSection(key)) {
+				//System.out.println(key);
+				PlayerFiles.getDatabaseObject().insertValue(plugin, player, key, getConfig().get(key));
+			}
+		}*/
 	}
 
 	public void saveDefaultConfig() {
@@ -75,8 +88,21 @@ public class PlayerConfig {
 	}
 
 	public <T> ConfigValue<T> getConfigValue(ConfigKey<T> key) {
-		ConfigValue<T> config = new ConfigValue(getConfig().get(key.getKey(), key.getDefaultValue()));
+		ConfigValue<T> config;
+
+		if (key.getType().equals(Double.class)) {
+			config = new ConfigValue(getConfig().getDouble(key.getKey(), (Double) key.getDefaultValue().getValue()));
+		} else if (key.getType().equals(Long.class)) {
+			config = new ConfigValue(getConfig().getDouble(key.getKey(), (Long) key.getDefaultValue().getValue()));
+		} else {
+			config = new ConfigValue(getConfig().get(key.getKey(), key.getDefaultValue()));
+		}
+
 		return config;
+	}
+
+	public <T> void setConfigValue(ConfigKey<T> key) {
+		setConfigValue(key, key.getDefaultValue());
 	}
 
 	public <T> void setConfigValue(ConfigKey<T> key, ConfigValue<T> value) {
