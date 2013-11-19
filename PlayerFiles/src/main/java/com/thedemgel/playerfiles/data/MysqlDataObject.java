@@ -1,5 +1,7 @@
 package com.thedemgel.playerfiles.data;
 
+import com.jolbox.bonecp.BoneCP;
+import com.jolbox.bonecp.BoneCPConfig;
 import com.thedemgel.playerfiles.ConfigKey;
 import com.thedemgel.playerfiles.ConfigValue;
 import com.thedemgel.playerfiles.PlayerObject;
@@ -23,7 +25,7 @@ import snaq.db.ConnectionPool;
 
 public class MysqlDataObject extends DataObject {
 
-	private final ConnectionPool conpool;
+	private BoneCP conpool;
 	private final JavaPlugin plugin;
 	private FileConfiguration config;
 
@@ -33,13 +35,14 @@ public class MysqlDataObject extends DataObject {
 		config = plugin.getConfig();
 		try {
 			Class c = Class.forName("com.mysql.jdbc.Driver");
-			Driver driver = (Driver) c.newInstance();
-			DriverManager.registerDriver(driver);
+			//Driver driver = (Driver) c.newInstance();
+			//DriverManager.registerDriver(driver);
 		} catch (ClassNotFoundException ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "Class not found: {0}", ex);
-		} catch (InstantiationException | IllegalAccessException | SQLException ex) {
-			Logger.getLogger(MysqlDataObject.class.getName()).log(Level.SEVERE, null, ex);
 		}
+
+		// BoneCP setup
+		BoneCPConfig boneconfig = new BoneCPConfig();
 		String url = "jdbc:mysql://"
 			+ config.getString("database.url")
 			+ ":"
@@ -48,14 +51,22 @@ public class MysqlDataObject extends DataObject {
 			+ config.getString("database.database")
 			+ "?zeroDateTimeBehavior=convertToNull";
 
-		conpool = new ConnectionPool("test",
+		boneconfig.setJdbcUrl(url);
+		boneconfig.setUsername(config.getString("database.username"));
+		boneconfig.setPassword(config.getString("database.password"));
+		try {
+			conpool = new BoneCP(boneconfig);
+			/*conpool = new ConnectionPool("test",
 			1,
 			10,
 			30,
 			180000,
 			url,
 			config.getString("database.username"),
-			config.getString("database.password"));
+			config.getString("database.password"));*/
+		} catch (SQLException ex) {
+			Logger.getLogger(MysqlDataObject.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 	@Override
@@ -75,10 +86,10 @@ public class MysqlDataObject extends DataObject {
 			+ " ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
 		Connection con = null;
-		long timeout = 3;  // 3 second timeout
+		//long timeout = 3;  // 3 second timeout
 
 		try {
-			con = conpool.getConnection(timeout);
+			con = conpool.getConnection();
 			if (con != null) {
 				PreparedStatement stat = con.prepareStatement(createStatement);
 				stat.execute();
@@ -99,13 +110,13 @@ public class MysqlDataObject extends DataObject {
 	}
 
 	public <T> ConfigValue<T> getValue(JavaPlugin plugin, String player, ConfigKey<T> key) {
-		long timeout = 3;
+		//long timeout = 3;
 		ConfigValue<T> confvalue = null;
 
 		String testsql2 = "SELECT value FROM `pf-" + plugin.getName() + "` WHERE "
 			+ "`player` = ? AND `key` = ?";
 
-		try (Connection con = conpool.getConnection(timeout)) {
+		try (Connection con = conpool.getConnection()) {
 			if (con != null) {
 				PreparedStatement statement = con.prepareStatement(testsql2);
 				statement.setString(1, player);
@@ -166,13 +177,13 @@ public class MysqlDataObject extends DataObject {
 
 	public void insertValue(JavaPlugin plugin, String player, String key, Object value) {
 		//Connection con = null;
-		long timeout = 3000;
+		//long timeout = 3000;
 
 		String testsql2 = "INSERT INTO `pf-" + plugin.getName() + "` (`player`, `key`, `value`) VALUES("
 			+ "?, ?, ?"
 			+ ") ON DUPLICATE KEY UPDATE `value` = ?";
 
-		try (Connection con = conpool.getConnection(timeout)) {
+		try (Connection con = conpool.getConnection()) {
 			if (con != null) {
 				PreparedStatement statement = con.prepareStatement(testsql2);
 				statement.setString(1, player);

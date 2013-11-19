@@ -25,18 +25,18 @@
             <configuration>
               <relocations>
                 <relocation>
-                  <pattern>snaq</pattern>
-                  <shadedPattern>net.player.snaq</shadedPattern>
+                  <pattern>com.jolbox</pattern>
+                  <shadedPattern>com.player.jolbox</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>org.apache</pattern>
-                  <shadedPattern>org.player.apache</shadedPattern>
+                  <pattern>org.slf4j</pattern>
+                  <shadedPattern>org.player.slf4j</shadedPattern>
                 </relocation>
               </relocations>
               <artifactSet>
                 <includes>
-                  <include>net.snaq:dbpool</include>
-                  <include>commons-logging</include>
+                  <include>com.jolbox</include>
+                  <include>org.slf4j</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -50,6 +50,12 @@
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.6.4-R2.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.snaq</groupId>
+      <artifactId>dbpool</artifactId>
+      <version>5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

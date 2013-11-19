@@ -1,63 +1,85 @@
-
 package com.thedemgel.stats;
 
 import com.thedemgel.playerfiles.ConfigValue;
-import com.thedemgel.playerfiles.PlayerConfig;
 import com.thedemgel.playerfiles.PlayerFiles;
-import com.thedemgel.playerfiles.PlayerObject;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-
 public class StatsListener implements Listener {
-	private Stats plugin;
 
+	private final Stats plugin;
+
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public StatsListener(Stats instance) {
 		plugin = instance;
+
+		// Create initial object to increase initial performance
+		new initStats();
 	}
 
 	@EventHandler
 	public void onPlayerJoinEvent(PlayerJoinEvent event) {
 
-		PlayerObject pobj = PlayerFiles.getPlayerFile(event.getPlayer());
-		//PlayerConfig pconf = pobj.getConfig(plugin);
-
-		// Check all stats
-		ConfigValue<Double> str = pobj.getValue(plugin, Stats.STAT_STR);
-		ConfigValue<Double> dex = pobj.getValue(plugin, Stats.STAT_DEX);
-		ConfigValue<Double> bod = pobj.getValue(plugin, Stats.STAT_BOD);
-		ConfigValue<Double> min = pobj.getValue(plugin, Stats.STAT_MIN);
-		ConfigValue<Double> wis = pobj.getValue(plugin, Stats.STAT_WIS);
-		ConfigValue<Double> chr = pobj.getValue(plugin, Stats.STAT_CHR);
-
-		ConfigValue<Long> exp = PlayerFiles.getDatabaseObject().getValue(plugin, pobj.getPlayer().getName(), Stats.EXPERIENCE);
-		ConfigValue<Double> exp_bonus = PlayerFiles.getDatabaseObject().getValue(plugin, pobj.getPlayer().getName(), Stats.EXPERIENCE_BONUS);
+		//long start = System.nanoTime();
+		String player = event.getPlayer().getName();
 
 
-		if (str == null) {
-			pobj.setValue(plugin, Stats.STAT_STR);
+		initStats init = new initStats(player);
+		PlayerFiles.getExecutorService().submit(init);//execute(new initStats(player));
+
+		//System.out.println(System.nanoTime() - start);
+	}
+
+	private class initStats implements Runnable {
+
+		private final String player;
+
+		public initStats() {
+			player = "";
 		}
-		if (dex == null) {
-			pobj.setValue(plugin, Stats.STAT_DEX);
+
+		public initStats(String player) {
+			this.player = player;
 		}
-		if (bod == null) {
-			pobj.setValue(plugin, Stats.STAT_BOD);
-		}
-		if (min == null) {
-			pobj.setValue(plugin, Stats.STAT_MIN);
-		}
-		if (wis == null) {
-			pobj.setValue(plugin, Stats.STAT_WIS);
-		}
-		if (chr == null) {
-			pobj.setValue(plugin, Stats.STAT_CHR);
-		}
-		if (exp == null) {
-			pobj.setValue(plugin, Stats.EXPERIENCE);
-		}
-		if (exp_bonus == null) {
-			pobj.setValue(plugin, Stats.EXPERIENCE_BONUS);
+
+		@Override
+		public void run() {
+			ConfigValue<Double> str = PlayerFiles.getValue(plugin, player, Stats.STAT_STR);
+			ConfigValue<Double> dex = PlayerFiles.getValue(plugin, player, Stats.STAT_DEX);
+			ConfigValue<Double> bod = PlayerFiles.getValue(plugin, player, Stats.STAT_BOD);
+			ConfigValue<Double> min = PlayerFiles.getValue(plugin, player, Stats.STAT_MIN);
+			ConfigValue<Double> wis = PlayerFiles.getValue(plugin, player, Stats.STAT_WIS);
+			ConfigValue<Double> chr = PlayerFiles.getValue(plugin, player, Stats.STAT_CHR);
+
+			ConfigValue<Long> exp = PlayerFiles.getValue(plugin, player, Stats.EXPERIENCE);
+			ConfigValue<Double> exp_bonus = PlayerFiles.getValue(plugin, player, Stats.EXPERIENCE_BONUS);
+
+			// Check all stats
+			if (str == null) {
+				PlayerFiles.setValue(plugin, player, Stats.STAT_STR);
+			}
+			if (dex == null) {
+				PlayerFiles.setValue(plugin, player, Stats.STAT_DEX);
+			}
+			if (bod == null) {
+				PlayerFiles.setValue(plugin, player, Stats.STAT_BOD);
+			}
+			if (min == null) {
+				PlayerFiles.setValue(plugin, player, Stats.STAT_MIN);
+			}
+			if (wis == null) {
+				PlayerFiles.setValue(plugin, player, Stats.STAT_WIS);
+			}
+			if (chr == null) {
+				PlayerFiles.setValue(plugin, player, Stats.STAT_CHR);
+			}
+			if (exp == null) {
+				PlayerFiles.setValue(plugin, player, Stats.EXPERIENCE);
+			}
+			if (exp_bonus == null) {
+				PlayerFiles.setValue(plugin, player, Stats.EXPERIENCE_BONUS);
+			}
 		}
 	}
 }

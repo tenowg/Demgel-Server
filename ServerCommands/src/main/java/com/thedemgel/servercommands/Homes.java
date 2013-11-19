@@ -45,7 +45,7 @@ public class Homes {
 
 	private ResponseObject setHome(CommandSender sender, String homename) {
 		Player player = (Player) sender;
-		PlayerObject pobj = PlayerFiles.getPlayerFile(player);
+		//PlayerObject pobj = PlayerFiles.getPlayerFile(player);
 
 		ConfigKey key = ConfigKey.newConfigKeyFromConfigKey(HOME_SECTION, ConfigurationSection.class, homename);
 
@@ -54,10 +54,10 @@ public class Homes {
 		ConfigKey<Double> y = ConfigKey.newConfigKeyFromConfigKey(key, Double.class, "location", "y");
 		ConfigKey<Double> z = ConfigKey.newConfigKeyFromConfigKey(key, Double.class, "location", "z");
 
-		pobj.setValue(world, new ConfigValue<>(player.getWorld().getName()));
-		pobj.setValue(x, new ConfigValue<>(player.getLocation().getX()));
-		pobj.setValue(y, new ConfigValue<>(player.getLocation().getY()));
-		pobj.setValue(z, new ConfigValue<>(player.getLocation().getZ()));
+		PlayerFiles.setValue(plugin, sender.getName(), world, new ConfigValue<>(player.getWorld().getName()));
+		PlayerFiles.setValue(plugin, sender.getName(), x, new ConfigValue<>(player.getLocation().getX()));
+		PlayerFiles.setValue(plugin, sender.getName(), y, new ConfigValue<>(player.getLocation().getY()));
+		PlayerFiles.setValue(plugin, sender.getName(), z, new ConfigValue<>(player.getLocation().getZ()));
 
 		return new ResponseObject("Home set Successfully", ResponseObjectType.SUCCESS);
 	}
@@ -87,25 +87,29 @@ public class Homes {
 
 		ConfigKey key = ConfigKey.newConfigKeyFromConfigKey(HOME_SECTION, ConfigurationSection.class, homename);
 
-		if (!pobj.getConfig().keyExists(key)) {
-			return new ResponseObject("Home doesn't exist.", ResponseObjectType.FAILURE);
-		}
+		//if (!pobj.getConfig().keyExists(key)) {
+			//return new ResponseObject("Home doesn't exist.", ResponseObjectType.FAILURE);
+		//}
 
 		ConfigKey<String> worldKey = ConfigKey.newConfigKeyFromConfigKey(key, String.class,"location", "world");
 		ConfigKey<Double> xKey = ConfigKey.newConfigKeyFromConfigKey(key, Double.class,"location", "x");
 		ConfigKey<Double> yKey = ConfigKey.newConfigKeyFromConfigKey(key, Double.class,"location", "y");
 		ConfigKey<Double> zKey = ConfigKey.newConfigKeyFromConfigKey(key, Double.class,"location", "z");
 
-		ConfigValue<Double> x = pobj.getValue(xKey);
-		ConfigValue<Double> y = pobj.getValue(yKey);
-		ConfigValue<Double> z = pobj.getValue(zKey);
-		ConfigValue<String> world = pobj.getValue(worldKey);
+		ConfigValue<Double> x = PlayerFiles.getValue(plugin, sender.getName(), xKey);
+		ConfigValue<Double> y = PlayerFiles.getValue(plugin, sender.getName(), yKey);
+		ConfigValue<Double> z = PlayerFiles.getValue(plugin, sender.getName(), zKey);
+		ConfigValue<String> world = PlayerFiles.getValue(plugin, sender.getName(), worldKey);
 
+		try {
 		World bworld = Bukkit.getWorld(world.getValue());
 
 		Location loc = new Location(bworld, x.getValue(), y.getValue(), z.getValue());
 
 		player.teleport(loc);
+		} catch (Exception e) {
+			return new ResponseObject("Error teleporting to " + homename.toLowerCase() + "...", ResponseObjectType.FAILURE);
+		}
 
 		return new ResponseObject("Teleporting to " + homename.toLowerCase() + "...", ResponseObjectType.SUCCESS);
 	}

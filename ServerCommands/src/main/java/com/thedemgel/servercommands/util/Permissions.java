@@ -7,4 +7,5 @@ public class Permissions {
 	public final static String SET_MULTI_HOME = "servercommands.home.multi";
 	public final static String SET_HOME = "servercommands.home";
 	public static final String SET_SPAWN = "servercommands.admin.setspawn";
+	public static final String VIEW_PLUGINS = "servercommands.view.plugins";
 }

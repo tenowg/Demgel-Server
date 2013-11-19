@@ -3,10 +3,15 @@ package com.thedemgel.stats;
 
 import com.thedemgel.playerfiles.ConfigKey;
 import com.thedemgel.playerfiles.PlayerFiles;
+import com.thedemgel.stats.command.command.StatCommands;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class Stats extends JavaPlugin {
+
+	public final static String prefix = ChatColor.AQUA + "[Stats] " + ChatColor.YELLOW;
+
 	public final static ConfigKey<Double> STAT_STR = ConfigKey.newConfigKeyFromString("stats.str", 6D);
 	public final static ConfigKey<Double> STAT_DEX = ConfigKey.newConfigKeyFromString("stats.dex", 6D);
 	public final static ConfigKey<Double> STAT_BOD = ConfigKey.newConfigKeyFromString("stats.bod", 6D);
@@ -19,6 +24,7 @@ public class Stats extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(new StatsListener(this), this);
+		getServer().getPluginCommand("stats").setExecutor(new StatCommands(this));
 		PlayerFiles.initPlugin(this);
 	}
 

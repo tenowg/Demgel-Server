@@ -4,16 +4,15 @@ package com.thedemgel.playerfiles;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class PlayerObject {
-	private Player player;
+	private final Player player;
 	private ConcurrentMap<JavaPlugin, PlayerConfig> configs;
-	private PlayerFiles plugin;
+	private final PlayerFiles plugin;
+	private ConcurrentMap<ConfigKey, ConfigValue> cache;
 
 	public PlayerObject(PlayerFiles plugin, Player bukkitPlayer) {
 
@@ -22,11 +21,13 @@ public class PlayerObject {
 		if (!PlayerFiles.isMysql()) {
 			configs = new ConcurrentHashMap<>();
 			pluginConfig(plugin, bukkitPlayer.getName());
+		} else {
+			cache = new ConcurrentHashMap<>();
 		}
 
 	}
 
-	public void pluginConfig(JavaPlugin plugin, String player) {
+	public final void pluginConfig(JavaPlugin plugin, String player) {
 		PlayerConfig conf = new PlayerConfig(plugin, player);
 		configs.put(plugin, conf);
 	}
@@ -46,11 +47,27 @@ public class PlayerObject {
 	public <T> void setValue(ConfigKey<T> key, ConfigValue<T> value) {
 		setValue(plugin, key, value);
 	}
-	
+
 	public <T> void setValue(JavaPlugin plugin, ConfigKey<T> key, ConfigValue<T> value) {
 		// If using database
 		if (PlayerFiles.isMysql()) {
-			PlayerFiles.getDatabaseObject().insertValue(plugin, player.getName(), key, value);
+
+			ConfigValue<T> cached;
+			if (cache.containsKey(key)) {
+				cached = cache.get(key);
+				if (!cached.equals(value)) {
+					cache.put(key, value);
+					cached = value;
+				}
+			} else {
+				cache.put(key, value);
+				cached = value;
+			}
+
+			if (cached.isDirty()) {
+				PlayerFiles.getDatabaseObject().insertValue(plugin, player.getName(), key, cached);
+				cached.setDirty(false);
+			}
 			return;
 		}
 
@@ -71,7 +88,18 @@ public class PlayerObject {
 	public <T> ConfigValue<T> getValue(JavaPlugin plugin, ConfigKey<T> key) {
 		// If using database
 		if (PlayerFiles.isMysql()) {
-			return PlayerFiles.getDatabaseObject().getValue(plugin, player.getName(), key);
+			ConfigValue<T> cached;
+
+			if (cache.containsKey(key)) {
+				cached = cache.get(key);
+				//System.out.println(key.getKey() + " was in cache: " + cached.getValue());
+			} else {
+				cached = PlayerFiles.getDatabaseObject().getValue(plugin, player.getName(), key);
+				if (cached != null) {
+					cache.put(key, cached);
+				}
+			}
+			return cached;
 		}
 
 		// If not using database

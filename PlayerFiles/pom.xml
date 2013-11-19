@@ -34,19 +34,29 @@
 						</goals>
 						<configuration>
 							<relocations>
-								<relocation>
+								<!--<relocation>
 									<pattern>snaq</pattern>
 									<shadedPattern>net.player.snaq</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>org.apache</pattern>
 									<shadedPattern>org.player.apache</shadedPattern>
+								</relocation>-->
+								<relocation>
+									<pattern>com.jolbox</pattern>
+									<shadedPattern>com.player.jolbox</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.slf4j</pattern>
+									<shadedPattern>org.player.slf4j</shadedPattern>
 								</relocation>
 							</relocations>
 							<artifactSet>
 								<includes>
-									<include>net.snaq:dbpool</include>
-									<include>commons-logging</include>
+									<!--<include>net.snaq:dbpool</include>
+									<include>commons-logging</include>-->
+									<include>com.jolbox</include>
+									<include>org.slf4j</include>
 								</includes>
 							</artifactSet>
 						</configuration>
